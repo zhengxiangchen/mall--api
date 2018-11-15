@@ -35,7 +35,7 @@ public class GoodsTypeService {
 	 * @return
 	 */
 	public GoodsTypeEntity findOne(String id) {
-		return goodsTypeDao.findOne(Integer.valueOf(id));
+		return goodsTypeDao.getOne(Integer.valueOf(id));
 	}
 	
 	

@@ -1,14 +1,9 @@
 package cn.sihai.soft.api.controller;
 
 import java.util.HashMap;
-
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.sihai.soft.api.utils.HttpAccess;
+import cn.sihai.soft.api.utils.rabbitmq.Sender;
 
 @RestController
 @RequestMapping("${basepath}/sendTempMsg")
@@ -32,7 +28,7 @@ public class SendTempMsgController {
 	private String template_id;
 	
 	@Autowired
-    JavaMailSender mailSender;//自动注入
+    private Sender sender;
 	
 	/**
 	 * 发送模板信息给用户，发送订单信息到商家邮箱
@@ -147,25 +143,25 @@ public class SendTempMsgController {
 			sb.append(addressMsg);
 			sb.append("</div>");
 			
-			String[] toAddress = new String[2];
-			toAddress[0] = "510849431@qq.com";
-//			toAddress[1] = "305711597@qq.com";
+			//把发送email的任务交给消息中间件rabbitmq
+			sender.sendEmail(sb.toString());
 			
-			MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
-            message.setFrom("510849431@qq.com");//设置发信人，发信人需要和spring.mail.username配置的一样否则报错
-            message.setTo("510849431@qq.com");//设置收信人
-            message.setSubject("小程序下单");	//设置主题
-            
-//            message.setText(sb.toString());//第二个参数true表示使用HTML语言来编写邮件
-            message.setText(sb.toString(),true);
-
-            mailSender.send(mimeMessage);
+			//通知后台有新订单了
+			sender.sendNewOrder(orderId);
+			
 			return "success";
 		}else{
 			return errmsg;
 		}
 		
+	}
+	
+	
+	
+	@RequestMapping(value = "/sendTest", method = RequestMethod.GET)
+	public String sendTest(){
+		sender.sendNewOrder("id:123456");
+		return "success";
 	}
 
 }

@@ -40,7 +40,7 @@ public class GoodsAllTypeService {
 	 * @return
 	 */
 	public GoodsAllTypeEntity findOne(String id) {
-		return goodsAllTypeDao.findOne(Integer.valueOf(id));
+		return goodsAllTypeDao.getOne(Integer.valueOf(id));
 	}
 
 

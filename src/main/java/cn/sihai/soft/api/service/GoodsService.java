@@ -45,7 +45,7 @@ public class GoodsService {
 
 
 	public GoodsEntity findOne(String id) {
-		return goodsDao.findOne(Integer.valueOf(id));
+		return goodsDao.getOne(Integer.valueOf(id));
 	}
 
 }

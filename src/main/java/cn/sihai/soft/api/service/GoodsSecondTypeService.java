@@ -37,7 +37,7 @@ public class GoodsSecondTypeService {
 	 * @return
 	 */
 	public GoodsSecondTypeEntity findOne(String id) {
-		return goodsSecondTypeDao.findOne(Integer.valueOf(id));
+		return goodsSecondTypeDao.getOne(Integer.valueOf(id));
 	}
 
 
